@@ -162,7 +162,7 @@ public class SeaViewController extends Canvas {
 		for (int i=1; i < fish_list_right.size(); i++) {
 			fish_list_right.get(i).moveRight();
 			 
-			if (fish_list_right.get(i).getX() + fish_list_right.get(i).getSize() >= frame_width)
+			if (fish_list_right.get(i).getX() - fish_list_right.get(i).getSize() >= frame_width)
 				fish_list_right.remove(i);
 		}
 	}
