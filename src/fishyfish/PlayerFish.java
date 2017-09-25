@@ -5,16 +5,18 @@ import java.awt.Graphics;
 
 class PlayerFish extends Fish {
 	private int boundary_height;
+	private int boundary_width;
 	private int score;
     
-    public PlayerFish(int x, int y, int height) {
+    public PlayerFish(int x, int y, int height, int width) {
         super(x,y);
-        species = "player fish";
-        color = Color.orange;
-        boundary_height = height;
-        speed = 12;
-        score = 0;
-        size = 70;
+        this.species = "player fish";
+        this.color = Color.orange;
+        this.boundary_height = height;
+        this.boundary_width = width;
+        this.speed = 12;
+        this.score = 0;
+        this.size = 70;
     }
     
     public void moveUp() {
@@ -33,7 +35,7 @@ class PlayerFish extends Fish {
     }
     
     public void moveRight() {
-    	if (this.x + this.size/2 + this.speed >= 0)
+    	if (this.x + this.size/2 + this.speed <= boundary_width)
     		this.x+=this.speed;
     }
     

@@ -92,7 +92,7 @@ public class SeaViewController extends Canvas {
 	    int random_y;
 	
 	    // Create Player
-	    fish_list.add( new PlayerFish((frame_width/2), (frame_height/2), frame_height) );
+	    fish_list.add( new PlayerFish((frame_width/2), (frame_height/2), frame_height, frame_width) );
 	    player_fish = (PlayerFish) fish_list.get(0);
 	
 	    // Quad I Fish
