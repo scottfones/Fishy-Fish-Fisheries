@@ -36,7 +36,8 @@ public class SeaViewController extends Canvas {
 	private boolean key_wait = true;
 	
 	// Fish Variables
-	private ArrayList<Fish> fish_list = new ArrayList<Fish>();
+	private ArrayList<Fish> fish_list_right = new ArrayList<Fish>();
+	private ArrayList<Fish> fish_list_left = new ArrayList<Fish>();
 	private PlayerFish player_fish;
 	
 	// RNG
@@ -80,7 +81,7 @@ public class SeaViewController extends Canvas {
 	// Starts Game */
 	private void startGame() {
 	 	// Reset Game Fish
-		fish_list.clear();
+		fish_list_right.clear();
 		initialFish();
 		gameLoop();
 	}
@@ -92,8 +93,8 @@ public class SeaViewController extends Canvas {
 	    int random_y;
 	
 	    // Create Player
-	    fish_list.add( new PlayerFish((frame_width/2), (frame_height/2), frame_height, frame_width) );
-	    player_fish = (PlayerFish) fish_list.get(0);
+	    fish_list_right.add( new PlayerFish((frame_width/2), (frame_height/2), frame_height, frame_width) );
+	    player_fish = (PlayerFish) fish_list_right.get(0);
 	
 	    // Quad I Fish
 	    random_x = rand_gen.nextInt(frame_width/2-100) + frame_width/2+100;
@@ -128,13 +129,13 @@ public class SeaViewController extends Canvas {
 	    int fish_type = rand_gen.nextInt(3);
 	
 	    if (fish_type == 0)
-	        fish_list.add( new SmallFish(x,y) );
+	        fish_list_right.add( new SmallFish(x,y) );
 	
 	    else if (fish_type == 1)
-	        fish_list.add( new MedFish(x,y) );
+	        fish_list_right.add( new MedFish(x,y) );
 	
 	    else 
-	        fish_list.add( new LargeFish(x,y) );
+	        fish_list_right.add( new LargeFish(x,y) );
 	}
 
 	
@@ -156,13 +157,24 @@ public class SeaViewController extends Canvas {
 	}
 	
 	
-	/* Moves All Nonplayer Fish*/
-	private void moveFish() {
-		for (int i=1; i < fish_list.size(); i++) {
-			fish_list.get(i).moveRight();
+	/* Moves Right Fish */
+	private void moveFishRight() {
+		for (int i=1; i < fish_list_right.size(); i++) {
+			fish_list_right.get(i).moveRight();
 			 
-			if (fish_list.get(i).getX() >= frame_width)
-				fish_list.remove(i);
+			if (fish_list_right.get(i).getX() + fish_list_right.get(i).getSize() >= frame_width)
+				fish_list_right.remove(i);
+		}
+	}
+	
+	
+	/* Moves Left Fish */
+	private void moveFishLeft() {
+		for (int i=0; i < fish_list_left.size(); i++) {
+			fish_list_left.get(i).moveLeft();
+			 
+			if (fish_list_left.get(i).getX() + fish_list_left.get(i).getSize() <= 0)
+				fish_list_left.remove(i);
 		}
 	}
 	 
@@ -170,15 +182,33 @@ public class SeaViewController extends Canvas {
 	/* Calculates if Player Eats or is Eaten */
 	private void eatOrEaten() {
 		Fish npc_fish;
-		for (int i=1; i < fish_list.size(); i++) {
-			npc_fish = fish_list.get(i);
+		
+		// Right Fish Check
+		for (int i=1; i < fish_list_right.size(); i++) {
+			npc_fish = fish_list_right.get(i);
 			
 			switch ( fishCollision(npc_fish) ) {
 				case 1:	gameOver();
 						break;
 						
 				case -1:player_fish.eats();	
-						fish_list.remove(i);
+						fish_list_right.remove(i);
+						break;
+						
+				default:break;
+			}
+		} 
+		
+		// Left Fish Check
+		for (int i=0; i < fish_list_left.size(); i++) {
+			npc_fish = fish_list_left.get(i);
+			
+			switch ( fishCollision(npc_fish) ) {
+				case 1:	gameOver();
+						break;
+						
+				case -1:player_fish.eats();	
+						fish_list_left.remove(i);
 						break;
 						
 				default:break;
@@ -216,15 +246,19 @@ public class SeaViewController extends Canvas {
 	        g.fillRect(0, 0, frame_width, frame_height);
 	
 	        // Move Fishies
-	        moveFish();
+	        moveFishRight();
+	        moveFishLeft();
 	         
 	        // Look for Collisions
 	        eatOrEaten();
 	        
 	        // Draw Fishies
-	        for (Fish f : fish_list) {
+	        for (Fish f : fish_list_right) 
 	            f.drawFishy(g);
-	        }
+	        
+	        for (Fish f : fish_list_left) 
+	            f.drawFishy(g);
+	        
 	
 	        // Potentially Draw Message
 	        if (key_wait) {
@@ -238,18 +272,28 @@ public class SeaViewController extends Canvas {
 	        // Update Screen
 	        g.dispose();
 	        strategy.show();
-	         
+	        
+	        /* Right Fish Add */
 	        // Add Small Fish
 	        if (time_diff % 200 == 0)
-	        	fish_list.add(new SmallFish(0, rand_gen.nextInt(frame_height)));
-	         
+	        	fish_list_right.add(new SmallFish(0, rand_gen.nextInt(frame_height)));       
 	        // Add Medium Fish
 	        if (time_diff % 300 == 0)
-	        	fish_list.add(new MedFish(0, rand_gen.nextInt(frame_height)));
-	         
+	        	fish_list_right.add(new MedFish(0, rand_gen.nextInt(frame_height)));	         
 	        // Add Large Fish
 	        if (time_diff % 400 == 0) 
-	        	fish_list.add(new LargeFish(0, rand_gen.nextInt(frame_height)));
+	        	fish_list_right.add(new LargeFish(0, rand_gen.nextInt(frame_height)));
+	        
+	        /* Left Fish Add */
+	        // Add Small Fish
+	        if (time_diff % 300 == 0)
+	        	fish_list_left.add(new SmallFish(frame_width, rand_gen.nextInt(frame_height)));       
+	        // Add Medium Fish
+	        if (time_diff % 400 == 0)
+	        	fish_list_left.add(new MedFish(frame_width, rand_gen.nextInt(frame_height)));	         
+	        // Add Large Fish
+	        if (time_diff % 500 == 0) 
+	        	fish_list_left.add(new LargeFish(frame_width, rand_gen.nextInt(frame_height)));
 	        
 	        // Reset Timer
 	        if (time_diff >= 1000)
@@ -284,7 +328,7 @@ public class SeaViewController extends Canvas {
 				System.exit(0);
 		
 			if (e.getKeyCode() == KeyEvent.VK_N && key_wait) {
-				fish_list.clear();
+				fish_list_right.clear();
 				initialFish();
 				key_wait = false;
 			
@@ -299,7 +343,7 @@ public class SeaViewController extends Canvas {
 	
 	// Game Entry Point - Main
 	public static void main(String[] args) {
-		SeaViewController game = new SeaViewController(1000,800);
+		SeaViewController game = new SeaViewController(1200,800);
 	
 		game.startGame();
 	}
